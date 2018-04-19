@@ -81,12 +81,14 @@ CONFIG_MOUNT_PATHS = [
 
 def database_param(suffix, default=None):
     for prefix in ['database', 'db']:
-        key = '%s-%s' % (prefix, suffix)
-        for path in CONFIG_MOUNT_PATHS:
-            if os.path.exists(os.path.join(path, key)):
-                return open(os.path.join(path, key)).read()
-        if key.upper().replace('-', '_') in os.environ:
-            return os.environ(key.upper().replace('-', '_'))
+        key_options = ['%s-%s' % (prefix, suffix),
+                       '%s_%s' % (prefix.upper(), suffix.upper())]
+        for key in key_options:
+            for path in CONFIG_MOUNT_PATHS:
+                if os.path.exists(os.path.join(path, key)):
+                    return open(os.path.join(path, key)).read()
+            if key in os.environ:
+                return os.environ(key.upper().replace('-', '_'))
     return default
 
 if any([os.path.exists(path) for path in CONFIG_MOUNT_PATHS]):
