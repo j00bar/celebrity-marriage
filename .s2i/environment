@@ -1,0 +1,3 @@
+ENABLE_PIPENV=1
+APP_MODULE=jagdemo.wsgi:application
+GUNICORN_CMD_ARGS="--reload"
