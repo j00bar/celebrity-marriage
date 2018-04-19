@@ -79,23 +79,25 @@ CONFIG_MOUNT_PATHS = [
     '/etc/secret-volume'
 ]
 
-def database_param(key, default=None):
-    for path in CONFIG_MOUNT_PATHS:
-        if os.path.exists(os.path.join(path, key)):
-            return open(os.path.join(path, key)).read()
-    if key.upper().replace('-', '_') in os.environ:
-        return os.environ(key.upper().replace('-', '_'))
+def database_param(suffix, default=None):
+    for prefix in ['database', 'db']:
+        key = '%s-%s' % (prefix, suffix)
+        for path in CONFIG_MOUNT_PATHS:
+            if os.path.exists(os.path.join(path, key)):
+                return open(os.path.join(path, key)).read()
+        if key.upper().replace('-', '_') in os.environ:
+            return os.environ(key.upper().replace('-', '_'))
     return default
 
 if any([os.path.exists(path) for path in CONFIG_MOUNT_PATHS]):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': database_param('database-name', 'postgres'),
-            'USER': database_param('database-user', 'postgres'),
-            'PASSWORD': database_param('database-password', ''),
-            'HOST': database_param('database-host', '127.0.0.1'),
-            'PORT': database_param('database-port', '5432')
+            'NAME': database_param('name', 'postgres'),
+            'USER': database_param('user', 'postgres'),
+            'PASSWORD': database_param('password', ''),
+            'HOST': database_param('host', '127.0.0.1'),
+            'PORT': database_param('port', '5432')
         }
     }
 else:
